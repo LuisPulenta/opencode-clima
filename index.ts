@@ -13,6 +13,7 @@ import {
   mostrarPronostico,
   simboloTemperatura,
 } from "./src/ui.ts";
+import { enRojo, enVerde } from "./src/colores.ts";
 
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 
@@ -36,7 +37,7 @@ async function elegirIndice(cantidad: number): Promise<number | null> {
   }
   const indice = Number.parseInt(entrada, 10) - 1;
   if (Number.isNaN(indice) || indice < 0 || indice >= cantidad) {
-    console.log("  Selección inválida.");
+    console.log(enRojo("  Selección inválida."));
     return null;
   }
   return indice;
@@ -44,7 +45,7 @@ async function elegirIndice(cantidad: number): Promise<number | null> {
 
 async function elegirCiudadDeLista(ajustes: Ajustes): Promise<number | null> {
   if (ajustes.cities.length === 0) {
-    console.log("\n  No hay ciudades registradas.");
+    console.log(enRojo("\n  No hay ciudades registradas."));
     return null;
   }
   console.log("");
@@ -58,12 +59,12 @@ async function elegirCiudadDeLista(ajustes: Ajustes): Promise<number | null> {
 
 async function accionClimaDefault(ajustes: Ajustes): Promise<void> {
   if (ajustes.defaultCity === null) {
-    console.log("\n  No hay una ciudad default establecida.");
+    console.log(enRojo("\n  No hay una ciudad default establecida."));
     return;
   }
   const datos = await obtenerClimaActual(ajustes.defaultCity, ajustes.unit);
   if (datos.current === undefined) {
-    console.log("\n  No se pudo obtener el clima actual.");
+    console.log(enRojo("\n  No se pudo obtener el clima actual."));
     return;
   }
   mostrarClimaActual(ajustes.defaultCity, datos.current, ajustes.unit);
@@ -71,7 +72,7 @@ async function accionClimaDefault(ajustes: Ajustes): Promise<void> {
 
 async function accionTodasLasCiudades(ajustes: Ajustes): Promise<void> {
   if (ajustes.cities.length === 0) {
-    console.log("\n  No hay ciudades registradas.");
+    console.log(enRojo("\n  No hay ciudades registradas."));
     return;
   }
   for (const ciudad of ajustes.cities) {
@@ -90,7 +91,7 @@ async function accionBuscarAgregar(ajustes: Ajustes): Promise<void> {
   }
   const resultados = await buscarCiudades(consulta);
   if (resultados.length === 0) {
-    console.log(`  No se encontraron ciudades para "${consulta}".`);
+    console.log(enRojo(`  No se encontraron ciudades para "${consulta}".`));
     return;
   }
   console.log("");
@@ -106,17 +107,19 @@ async function accionBuscarAgregar(ajustes: Ajustes): Promise<void> {
     return;
   }
   if (ajustes.cities.some((registrada) => mismaCiudad(registrada, ciudad))) {
-    console.log(`  ${etiquetaCiudad(ciudad)} ya está registrada.`);
+    console.log(enRojo(`  ${etiquetaCiudad(ciudad)} ya está registrada.`));
     return;
   }
   ajustes.cities.push(ciudad);
   if (ajustes.defaultCity === null) {
     ajustes.defaultCity = ciudad;
     console.log(
-      `  Ciudad agregada: ${etiquetaCiudad(ciudad)} (establecida como default).`,
+      enVerde(
+        `  Ciudad agregada: ${etiquetaCiudad(ciudad)} (establecida como default).`,
+      ),
     );
   } else {
-    console.log(`  Ciudad agregada: ${etiquetaCiudad(ciudad)}.`);
+    console.log(enVerde(`  Ciudad agregada: ${etiquetaCiudad(ciudad)}.`));
   }
   await guardarAjustes(ajustes);
 }
@@ -134,9 +137,11 @@ async function accionEliminar(ajustes: Ajustes): Promise<void> {
     ajustes.defaultCity = ajustes.cities[0] ?? null;
   }
   await guardarAjustes(ajustes);
-  console.log(`  Ciudad eliminada: ${etiquetaCiudad(eliminada)}.`);
+  console.log(enVerde(`  Ciudad eliminada: ${etiquetaCiudad(eliminada)}.`));
   if (ajustes.defaultCity !== null) {
-    console.log(`  Nueva ciudad default: ${etiquetaCiudad(ajustes.defaultCity)}.`);
+    console.log(
+      enVerde(`  Nueva ciudad default: ${etiquetaCiudad(ajustes.defaultCity)}.`),
+    );
   }
 }
 
@@ -151,7 +156,7 @@ async function accionEstablecerDefault(ajustes: Ajustes): Promise<void> {
   }
   ajustes.defaultCity = ciudad;
   await guardarAjustes(ajustes);
-  console.log(`  Ciudad default: ${etiquetaCiudad(ciudad)}.`);
+  console.log(enVerde(`  Ciudad default: ${etiquetaCiudad(ciudad)}.`));
 }
 
 async function accionPronostico(ajustes: Ajustes): Promise<void> {
@@ -165,7 +170,7 @@ async function accionPronostico(ajustes: Ajustes): Promise<void> {
   }
   const datos = await obtenerPronostico(ciudad, ajustes.unit);
   if (datos.daily === undefined) {
-    console.log("\n  No se pudo obtener el pronóstico.");
+    console.log(enRojo("\n  No se pudo obtener el pronóstico."));
     return;
   }
   mostrarPronostico(ciudad, datos.daily, ajustes.unit);
@@ -178,7 +183,9 @@ async function accionAjustes(ajustes: Ajustes): Promise<void> {
     ajustes.unit === "metric"
       ? "Celsius, km/h, mm"
       : "Fahrenheit, mph, in";
-  console.log(`\n  Unidades cambiadas a ${detalle} (${simboloTemperatura(ajustes.unit)}).`);
+  console.log(
+    enVerde(`\n  Unidades cambiadas a ${detalle} (${simboloTemperatura(ajustes.unit)}).`),
+  );
 }
 
 async function principal(): Promise<void> {
@@ -218,12 +225,12 @@ async function principal(): Promise<void> {
           await accionAjustes(ajustes);
           break;
         default:
-          console.log("\n  Opción no válida.");
+          console.log(enRojo("\n  Opción no válida."));
           break;
       }
     } catch (error) {
       const mensaje = error instanceof Error ? error.message : String(error);
-      console.log(`\n  Error: ${mensaje}`);
+      console.log(enRojo(`\n  Error: ${mensaje}`));
     }
 
     await pausar();

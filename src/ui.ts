@@ -1,5 +1,6 @@
 import type { Ajustes, Ciudad, ClimaActual, ClimaDiario, Unidad } from "./tipos.ts";
 import { describirClima } from "./wmo.ts";
+import { enAmarillo, enCyan } from "./colores.ts";
 
 declare const console: { log(...data: unknown[]): void };
 
@@ -27,10 +28,11 @@ export function etiquetaCiudad(ciudad: Ciudad): string {
 export function construirMenu(ajustes: Ajustes): string {
   const cantidad = ajustes.cities.length;
   const unidad = simboloTemperatura(ajustes.unit);
+  const linea = enCyan(LINEA);
   return [
-    LINEA,
-    "         WEATHER CLI",
-    LINEA,
+    linea,
+    enCyan("         WEATHER CLI"),
+    linea,
     "  1. Clima de ciudad default",
     `  2. Clima de todas las ciudades (${cantidad})`,
     "  3. Buscar y agregar ciudad",
@@ -39,7 +41,7 @@ export function construirMenu(ajustes: Ajustes): string {
     "  6. Pronóstico 7 días",
     `  8. Ajustes (${unidad})`,
     "  9. Salir",
-    LINEA,
+    linea,
     "  Selecciona una opción: ",
   ].join("\n");
 }
@@ -53,8 +55,12 @@ export function mostrarClimaActual(
   const etiquetaViento = simboloViento(unidad);
   console.log(`\n  Clima en ${etiquetaCiudad(ciudad)}`);
   console.log(`  ${"─".repeat(38)}`);
-  console.log(`  Temperatura:  ${actual.temperature_2m.toFixed(1)} ${etiquetaTemp}`);
-  console.log(`  Sensación:    ${actual.apparent_temperature.toFixed(1)} ${etiquetaTemp}`);
+  console.log(
+    `  Temperatura:  ${enAmarillo(`${actual.temperature_2m.toFixed(1)} ${etiquetaTemp}`)}`,
+  );
+  console.log(
+    `  Sensación:    ${enAmarillo(`${actual.apparent_temperature.toFixed(1)} ${etiquetaTemp}`)}`,
+  );
   console.log(`  Condición:    ${describirClima(actual.weather_code)}`);
   console.log(`  Viento:       ${actual.wind_speed_10m.toFixed(1)} ${etiquetaViento}`);
   console.log(`  Humedad:      ${actual.relative_humidity_2m} %`);
@@ -94,14 +100,15 @@ export function mostrarPronostico(
       continue;
     }
     const fechaCorta = formatearFecha(fecha);
-    const textoMin = `${minima.toFixed(1)} ${etiquetaTemp}`;
-    const textoMax = `${maxima.toFixed(1)} ${etiquetaTemp}`;
-    const textoPrecip =
+    const textoMin = `${minima.toFixed(1)} ${etiquetaTemp}`.padEnd(9);
+    const textoMax = `${maxima.toFixed(1)} ${etiquetaTemp}`.padEnd(9);
+    const textoPrecip = (
       precipitacion === undefined
         ? "-"
-        : `${precipitacion.toFixed(1)} ${etiquetaPrecip}`;
+        : `${precipitacion.toFixed(1)} ${etiquetaPrecip}`
+    ).padEnd(10);
     console.log(
-      `  ${fechaCorta.padEnd(8)} ${textoMin.padEnd(9)} ${textoMax.padEnd(9)} ${textoPrecip.padEnd(10)} ${describirClima(codigo)}`,
+      `  ${fechaCorta.padEnd(8)} ${enAmarillo(textoMin)} ${enAmarillo(textoMax)} ${textoPrecip} ${describirClima(codigo)}`,
     );
   }
 }

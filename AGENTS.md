@@ -21,7 +21,7 @@ App de consola (Bun + TypeScript) que consulta el clima por ciudad con Open-Mete
 ## Trampas
 
 - `tsconfig.json` es estricto: `verbatimModuleSyntax` exige `import type` para tipos; `noUncheckedIndexedAccess` obliga a manejar accesos a índice como posiblemente `undefined`; `moduleResolution: bundler` y `allowImportingTsExtensions` permiten importar con extensión `.ts`.
-- `bun-types` ya declara las globales `console`, `fetch` y `process`; no hace falta `declare` manual.
+- `bun-types` (vía `@types/bun`) declara las globales `console`, `fetch`, `process` y `Bun`; no hace falta `declare` manual. `tsconfig.json` fija `"types": ["bun"]` explícitamente para que el TS server del editor las vea también — si algún editor las pinta en rojo, reiniciar el TS server (`TypeScript: Restart TS Server`).
 - **Input por pipe**: con `readline`, las líneas que llegan sin un `question` pendiente se descartan (y un EOF produce `ERR_USE_AFTER_CLOSE`, manejado al final de `index.ts`). Por eso un test automatizado que envíe stdin debe esperar a ver cada prompt antes de responder cada línea.
 - La ciudad default se guarda como referencia a una ciudad registrada (coordenadas incluidas); al eliminar la default se promueve la primera restante.
 - Idioma del proyecto: español. Docs, comentarios nuevos y mensajes al usuario en español; mantener en inglés identificadores, nombres de APIs y keywords.

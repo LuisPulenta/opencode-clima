@@ -27,6 +27,6 @@
     "noPropertyAccessFromIndexSignature": false,
 
     // Globales de Bun (Bun, fetch, console, process) para editor y CLI
-    "types": ["@types/bun"]
+    "types": ["bun"]
   }
 }
