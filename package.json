@@ -1,14 +1,14 @@
 {
   "name": "02-weatherapp2",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "type": "module",
   "private": true,
   "scripts": {
 
-    "dev": "bun run index.ts --watch",
+    "dev": "bun run src/index.ts --watch",
     "typecheck": "bunx tsc --noEmit",
-    "build": "bun build --compile index.ts --outfile out/weather-cli",
-    "start": "bun run index.ts"
+    "build": "bun build --compile src/index.ts --outfile out/weather-cli",
+    "start": "bun run src/index.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

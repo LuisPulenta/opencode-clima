@@ -1,6 +1,5 @@
-import type { Ajustes } from "./tipos.ts";
-
-const ARCHIVO_DATOS = "data.json";
+import type { Ajustes } from "../types/Settings.ts";
+import { ARCHIVO_DATOS } from "../utils/constants.ts";
 
 const AJUSTES_POR_DEFECTO: Ajustes = {
   defaultCity: null,

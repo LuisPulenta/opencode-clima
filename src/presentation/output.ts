@@ -1,49 +1,35 @@
-import type { Ajustes, Ciudad, ClimaActual, ClimaDiario, Unidad } from "./tipos.ts";
-import { describirClima } from "./wmo.ts";
-import { enAmarillo, enCyan } from "./colores.ts";
+import type { Ciudad } from "../types/City.ts";
+import type { Unidad } from "../types/Settings.ts";
+import type { ClimaActual, ClimaDiario } from "../types/Weather.ts";
+import { enAmarillo, enRojo, enVerde } from "../utils/colors.ts";
+import {
+  etiquetaCiudad,
+  formatearFecha,
+  simboloPrecipitacion,
+  simboloTemperatura,
+  simboloViento,
+} from "../utils/format.ts";
+import { describirClima } from "../utils/wmo.ts";
 
 declare const console: { log(...data: unknown[]): void };
 
-const LINEA = "═".repeat(40);
-
-export function simboloTemperatura(unidad: Unidad): string {
-  return unidad === "imperial" ? "°F" : "°C";
+export function mostrarError(mensaje: string): void {
+  console.log(enRojo(mensaje));
 }
 
-export function simboloViento(unidad: Unidad): string {
-  return unidad === "imperial" ? "mph" : "km/h";
+export function mostrarExito(mensaje: string): void {
+  console.log(enVerde(mensaje));
 }
 
-export function simboloPrecipitacion(unidad: Unidad): string {
-  return unidad === "imperial" ? "in" : "mm";
+export function mostrarAviso(mensaje: string): void {
+  console.log(mensaje);
 }
 
-export function etiquetaCiudad(ciudad: Ciudad): string {
-  const partes = [ciudad.name, ciudad.admin1, ciudad.country].filter(
-    (parte): parte is string => typeof parte === "string" && parte.length > 0,
-  );
-  return partes.join(", ");
-}
-
-export function construirMenu(ajustes: Ajustes): string {
-  const cantidad = ajustes.cities.length;
-  const unidad = simboloTemperatura(ajustes.unit);
-  const linea = enCyan(LINEA);
-  return [
-    linea,
-    enCyan("         WEATHER CLI"),
-    linea,
-    `  ${enCyan("1")}. Clima de ciudad default`,
-    `  ${enCyan("2")}. Clima de todas las ciudades (${cantidad})`,
-    `  ${enCyan("3")}. Buscar y agregar ciudad`,
-    `  ${enCyan("4")}. Eliminar ciudad`,
-    `  ${enCyan("5")}. Establecer ciudad default`,
-    `  ${enCyan("6")}. Pronóstico 7 días`,
-    `  ${enCyan("8")}. Ajustes (${unidad})`,
-    `  ${enCyan("9")}. Salir`,
-    linea,
-    enCyan("  Selecciona una opción: "),
-  ].join("\n");
+export function mostrarListado(items: string[]): void {
+  console.log("");
+  items.forEach((item, i) => {
+    console.log(`  ${i + 1}. ${item}`);
+  });
 }
 
 export function mostrarClimaActual(
@@ -64,14 +50,6 @@ export function mostrarClimaActual(
   console.log(`  Condición:    ${describirClima(actual.weather_code)}`);
   console.log(`  Viento:       ${actual.wind_speed_10m.toFixed(1)} ${etiquetaViento}`);
   console.log(`  Humedad:      ${actual.relative_humidity_2m} %`);
-}
-
-function formatearFecha(fecha: string): string {
-  const [anio, mes, dia] = fecha.split("-");
-  if (anio === undefined || mes === undefined || dia === undefined) {
-    return fecha;
-  }
-  return `${dia}/${mes}`;
 }
 
 export function mostrarPronostico(

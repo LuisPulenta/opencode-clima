@@ -1,39 +1,8 @@
-import type {
-  Ciudad,
-  RespuestaClima,
-  RespuestaGeocoding,
-  ResultadoGeocoding,
-  Unidad,
-} from "./tipos.ts";
-
-const URL_GEOCODING = "https://geocoding-api.open-meteo.com/v1/search";
-const URL_CLIMA = "https://api.open-meteo.com/v1/forecast";
-
-async function pedirJson<T>(url: URL): Promise<T> {
-  const respuesta = await fetch(url);
-  if (!respuesta.ok) {
-    throw new Error(`La API respondió con estado ${respuesta.status}`);
-  }
-  return (await respuesta.json()) as T;
-}
-
-export async function buscarCiudades(consulta: string): Promise<Ciudad[]> {
-  const url = new URL(URL_GEOCODING);
-  url.searchParams.set("name", consulta);
-  url.searchParams.set("count", "5");
-  url.searchParams.set("language", "es");
-  url.searchParams.set("format", "json");
-
-  const datos = await pedirJson<RespuestaGeocoding>(url);
-  return (datos.results ?? []).map((resultado: ResultadoGeocoding) => ({
-    name: resultado.name,
-    admin1: resultado.admin1,
-    country: resultado.country,
-    country_code: resultado.country_code,
-    latitude: resultado.latitude,
-    longitude: resultado.longitude,
-  }));
-}
+import type { Ciudad } from "../types/City.ts";
+import type { Unidad } from "../types/Settings.ts";
+import type { RespuestaClima } from "../types/Weather.ts";
+import { URL_CLIMA } from "../utils/constants.ts";
+import { pedirJson } from "./http.ts";
 
 function aplicarUnidades(url: URL, unidad: Unidad): void {
   if (unidad === "imperial") {
