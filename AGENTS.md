@@ -1,4 +1,4 @@
-# AGENTS.md — Weather CLI App
+# AGENTS.md — Weather CLI App!
 
 App de consola (Bun + TypeScript) que consulta el clima por ciudad con Open-Meteo, según el menú y la apariencia definidos en `README.md`.
 
