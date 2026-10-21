@@ -3,3 +3,5 @@ Vamos a crear una aplicación del clima. Por favor avócate al archivo @README.m
 Quiero implementar colores en la aplicacion como se indica en @ideas-revision
 
 Necesito que hagamos una refactorizaciòn en nuestro proyecto y el source debe de lucir exactamente como te lo estoy dejando en el archivo de referencia @references/file-system.md
+
+Vamos a implementar todo el testing automático usando el bun.js. No debemos construir la aplicación si el testing falla. Por favor crea todo el testing dentro de la carpeta @tests.

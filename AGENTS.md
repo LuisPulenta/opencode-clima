@@ -11,13 +11,15 @@ App de consola (Bun + TypeScript) que consulta el clima por ciudad con Open-Mete
 - `src/api/` — `geocoding.ts` (`count=5`), `weather.ts` (actual + 7 días, `timezone=auto`), `http.ts` (`pedirJson` compartido).
 - `src/types/` — `City.ts` (`Ciudad`), `Settings.ts` (`Unidad`, `Ajustes`), `Weather.ts`, `Geocoding.ts`, `MenuOption.ts` (`OpcionMenu` + `AccionMenu`).
 - `src/utils/` — `format.ts` (etiqueta de ciudad, símbolos de unidades, fechas), `constants.ts` (URLs, `ARCHIVO_DATOS`, `LINEA`), `colors.ts` (ANSI con soporte `NO_COLOR`), `wmo.ts` (códigos WMO a descripciones en español).
+- `tests/` — suite con `bun test` (82 tests, sin red). `tests/helpers.ts` tiene fábricas (`crearCiudad`, `crearAjustes`), datos de clima de ejemplo y `espiaConsoleLog()`/`entrarDirTemporal()`. Los tests de actions mockean solo `src/presentation/input.ts` (vía `mock.module`) y `globalThis.fetch`; `cli.test.ts` es E2E offline (spawn del CLI, patrón esperar-prompt → enviar). Todos los tests usan directorios temporales; nunca escriben el `data.json` real.
 
 ## Comandos
 
 - Runtime y gestor de paquetes: **Bun**. Usar `bun` / `bunx`, NO `npm` ni `node` (hay `bun.lock`, no `package-lock.json`).
 - `bun run dev` (o `bun run src/index.ts`) — ejecutar la app.
 - `bun run typecheck` (`bunx tsc --noEmit`) — verificar.
-- `bun run build` — compila a binario ejecutable en `out/weather-cli.exe` (objetivo final del proyecto). No hay lint ni tests; no inventar comandos.
+- `bun run test` (`bun test`) y `bun run test:watch` — no hay lint; no inventar comandos.
+- `bun run build` — gate: ejecuta `bun test` primero; si algún test falla NO compila. Si pasa, compila a binario ejecutable en `out/weather-cli.exe`.
 
 ## Trampas
 
