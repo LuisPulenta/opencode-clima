@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Instalar dependencias
+        run: bun install --frozen-lockfile
+
+      - name: Leer versión de package.json
+        id: version
+        shell: bash
+        run: echo "version=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
+
+      # El release es idempotente: si el tag v<versión> ya existe, termina sin hacer nada.
+      - name: Verificar si el tag ya existe
+        id: tag
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if git ls-remote --exit-code origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            echo "existe=true" >> "$GITHUB_OUTPUT"
+            echo "El tag v${VERSION} ya existe; omitiendo release."
+          else
+            echo "existe=false" >> "$GITHUB_OUTPUT"
+            echo "El tag v${VERSION} no existe; procediendo con el release."
+          fi
+
+      # Gate: bun run build ejecuta bun test primero; si un test falla, no compila.
+      - name: Construir binario
+        if: steps.tag.outputs.existe == 'false'
+        run: bun run build
+
+      - name: Crear release con binario
+        if: steps.tag.outputs.existe == 'false'
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "v${VERSION}"
+          --target "${{ github.sha }}"
+          --title "Weather CLI v${VERSION}"
+          --generate-notes
+          out/weather-cli.exe
